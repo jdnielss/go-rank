@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -87,9 +88,59 @@ func executeCode(language, code, input string) (string, error) {
 		}
 
 		cmd = exec.Command("go", "run", tempFile.Name())
+	case "java":
+		log.Println("Executing Java code")
+
+		// Create a temporary directory
+		tempDir, err := os.MkdirTemp("", "java")
+		if err != nil {
+			log.Printf("Error creating temp directory: %v", err)
+			return "", err
+		}
+		defer os.RemoveAll(tempDir)
+
+		// Create a file named Main.java in the temporary directory
+		tempFile := filepath.Join(tempDir, "Main.java")
+		if err := os.WriteFile(tempFile, []byte(code), 0644); err != nil {
+			log.Printf("Error writing to temp file: %v", err)
+			return "", err
+		}
+
+		// Compile the Java code
+		compileCmd := exec.Command("javac", tempFile)
+		var compileOut, compileErr bytes.Buffer
+		compileCmd.Stdout = &compileOut
+		compileCmd.Stderr = &compileErr
+		log.Printf("Running command: %v", compileCmd)
+		if err := compileCmd.Run(); err != nil {
+			log.Printf("Error compiling Java code: %v\n%s", err, compileErr.String())
+			return compileErr.String(), err
+		}
+
+		// Run the compiled Java code
+		cmd = exec.Command("java", "-cp", tempDir, "Main")
+	case "python":
+		log.Println("Executing Python code")
+		tempFile, err := os.CreateTemp("", "*.py")
+		if err != nil {
+			log.Printf("Error creating temp file: %v", err)
+			return "", err
+		}
+		defer os.Remove(tempFile.Name())
+
+		if _, err := tempFile.WriteString(code); err != nil {
+			log.Printf("Error writing to temp file: %v", err)
+			return "", err
+		}
+		if err := tempFile.Close(); err != nil {
+			log.Printf("Error closing temp file: %v", err)
+			return "", err
+		}
+
+		cmd = exec.Command("python3", tempFile.Name())
 	default:
-		err := errors.New("unsupported language")
-		log.Printf("Error: %v", err)
+		err := errors.New("unsupported languageasassasasasassaasasasas")
+		log.Printf("Error languageasassasasasassaasasasas: %v", err)
 		return "", err
 	}
 
