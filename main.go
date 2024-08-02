@@ -139,8 +139,8 @@ func executeCode(language, code, input string) (string, error) {
 
 		cmd = exec.Command("python3", tempFile.Name())
 	default:
-		err := errors.New("unsupported languageasassasasasassaasasasas")
-		log.Printf("Error languageasassasasasassaasasasas: %v", err)
+		err := errors.New("unsupported language")
+		log.Printf("Error language: %v", err)
 		return "", err
 	}
 
