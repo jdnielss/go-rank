@@ -2,7 +2,6 @@
 ### Example user template
 
 # IntelliJ project files
-*.iml
 out
 gen
 ### Go template
@@ -27,5 +26,5 @@ gen
 
 # Go workspace file
 go.work
-
-/.idea/
+!/.idea/
+!/go-rank.iml
